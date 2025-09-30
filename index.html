@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Soumita</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --pink1:#ffe1ec;
+      --pink2:#fff0f5;
+      --brand:#e60073;
+      --dark:#333;
+      --light:#fff;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body{
+      font-family:'Poppins', sans-serif;
+      margin:0; 
+      padding:0;
+      background:linear-gradient(to right, var(--pink1), var(--pink2));
+      overflow-x:hidden; 
+      position:relative; 
+      color:var(--dark);
+      min-height: 100vh;
+    }
+    
+    /* Dark mode styles */
+    body.dark-mode {
+      background: linear-gradient(to right, #1a1a2e, #16213e);
+      color: var(--light);
+    }
+    
+    body.dark-mode .heading {
+      background: linear-gradient(90deg, #0f3460, #16213e, #1a1a2e);
+    }
+    
+    body.dark-mode .popup-content {
+      background: #1a1a2e;
+      color: var(--light);
+    }
+    
+    body.dark-mode #puzzle {
+      background: #0f3460;
+      border-color: #e60073;
+    }
+    
+    body.dark-mode .tile {
+      border-color: #555;
+    }
+    
+    body.dark-mode .empty {
+      background: #1a1a2e;
+    }
+    
+    body.dark-mode #catch-game {
+      background: #0f3460;
+      border-color: #e60073;
+    }
+    
+    body.dark-mode footer {
+      background: #0f3460;
+    }
+    
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.7);
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.1);
+      background: rgba(255, 255, 255, 0.9);
+    }
+    
+    /* Floating emojis background */
+    .floating-emoji{
+      position:fixed;
+      font-size:28px;
+      opacity:.7;
+      animation:floatEmoji 15s linear infinite;
+      z-index:0;
+      pointer-events:none;
+    }
+    
+    @keyframes floatEmoji{
+      0%{transform:translateY(110vh) rotate(0);opacity:1;}
+      100%{transform:translateY(-120vh) rotate(360deg);opacity:0;}
+    }
+
+    /* Header */
+    .heading{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:22px 24px 18px;
+      background:linear-gradient(90deg, #ff9aa2, #ffb6a0, #ffd3a5);
+      border-bottom:5px solid var(--brand);
+      box-shadow:0 6px 20px rgba(0,0,0,.25);
+      position:relative;
+      z-index:1;
+    }
+    
+    .emoji-side{
+      font-size:42px;
+      display:flex;
+      gap:14px;
+    }
+    
+    .emoji-side span{
+      display:inline-block;
+      animation:bounce 2s infinite ease-in-out;
+    }
+    
+    @keyframes bounce{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
+    }
+
+    /* Title block */
+    .title-wrap{
+      flex:1;
+      text-align:center;
+      line-height:1.1;
+      color:#fff;
+      position:relative;
+    }
+    
+    #birthday-title{
+      display:inline-block;
+      white-space:nowrap;
+      font-weight:900;
+      font-size:clamp(28px,5vw,44px);
+      letter-spacing:.05em;
+      text-shadow:2px 2px 6px rgba(0,0,0,.3),0 0 12px #ffb3d9,0 0 25px #ff66b2;
+      margin:0;
+      min-height:1em;
+    }
+    
+    #birthday-title span{
+      display:inline-block;
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .28s ease,transform .28s ease;
+    }
+    
+    #birthdate{
+      margin:8px 0 0;
+      font-size:18px;
+      font-weight:700;
+      color:#fff;
+      text-shadow:1px 1px 4px rgba(0,0,0,.4),0 0 12px #ff66b2;
+      opacity:0;
+      transform:translateY(6px);
+      transition:opacity .8s ease,transform .8s ease;
+    }
+
+    /* Main container */
+    .container{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      padding:40px;
+      position:relative;
+      z-index:1;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:20px;
+      margin-left:60px;
+    }
+    
+    .grid img{
+      width:220px;
+      height:280px;
+      object-fit:cover;
+      border-radius:15px;
+      box-shadow:0 6px 14px rgba(0,0,0,.25);
+      transition:transform .3s ease, box-shadow .3s ease;
+    }
+    
+    .grid img:hover{
+      transform:scale(1.05) rotate(-2deg);
+      box-shadow: 0 10px 20px rgba(0,0,0,.3);
+    }
+
+    /* Circle profile */
+    .circle-container{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      margin-right:100px;
+      margin-top:40px;
+      position:relative;
+    }
+    
+    .circle-photo{
+      width:270px;
+      height:270px;
+      border-radius:50%;
+      overflow:hidden;
+      border:6px solid #ff3399;
+      box-shadow:0 6px 25px rgba(0,0,0,.35);
+      transition:transform .4s ease;
+    }
+    
+    .circle-photo:hover{
+      transform:scale(1.08) rotate(5deg);
+    }
+    
+    .circle-photo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+    }
+    
+    .circle-container h3{
+      margin-top:15px;
+      font-size:26px;
+      color:var(--brand);
+      text-shadow:2px 2px 5px rgba(0,0,0,.3)
+    }
+
+    /* Buttons */
+    .celebrate-btn, .message-btn, .music-btn, .game-btn{
+      margin-top:15px;
+      padding:12px 24px;
+      font-size:18px;
+      font-weight:700;
+      background:linear-gradient(135deg,#ff66b2,#ff99cc);
+      color:#fff;
+      border:none;
+      border-radius:25px;
+      cursor:pointer;
+      box-shadow:0 5px 15px rgba(0,0,0,.3);
+      transition:transform .2s ease,filter .2s ease;
+      width: 100%;
+      max-width: 250px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    
+    .celebrate-btn:hover, .message-btn:hover, .music-btn:hover, .game-btn:hover{
+      transform:scale(1.08);
+      filter:saturate(1.2);
+    }
+
+    /* Popup message */
+    .popup{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.6);
+      display:none;
+      justify-content:center;
+      align-items:center;
+      z-index:9999;
+    }
+    
+    .popup-content{
+      background:#fff0f6;
+      padding:25px;
+      border-radius:20px;
+      box-shadow:0 6px 20px rgba(0,0,0,.3);
+      max-width:600px;
+      text-align:center;
+      font-size:18px;
+      color:var(--brand);
+      line-height:1.8;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .popup-content strong{
+      font-size:22px;
+      color:var(--brand);
+      text-shadow:0 0 8px #ff66b2;
+    }
+    
+    .close-btn{
+      margin-top:15px;
+      padding:8px 20px;
+      background:#ff3385;
+      color:#fff;
+      border:none;
+      border-radius:15px;
+      cursor:pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    /* Confetti */
+    .confetti{
+      position:fixed; 
+      top:-10px; 
+      width:10px; 
+      height:20px; 
+      background:red; 
+      opacity:.9;
+      animation:fall linear forwards; 
+      z-index:2; 
+      pointer-events:none;
+    }
+    
+    @keyframes fall{
+      to{ transform:translateY(100vh) rotate(360deg); opacity:0;}
+    }
+    
+    /* Hint highlight */
+    .hint {
+      border: 4px solid #ffcc00 !important;
+      box-shadow: 0 0 18px #ffcc00;
+      transition: all 0.3s ease;
+    }
+    
+    /* Solution highlight */
+    .solution-tile {
+      position: relative;
+    }
+    
+    .solution-tile::after {
+      content: attr(data-pos);
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 12px;
+      padding: 2px 5px;
+      border-radius: 3px;
+      z-index: 10;
+    }
+
+    /* Balloons */
+    .balloon{
+      position:fixed; 
+      bottom:-150px; 
+      width:60px; 
+      height:80px; 
+      background:pink; 
+      border-radius:50%;
+      animation:rise ease-in forwards; 
+      z-index:2; 
+      pointer-events:none;
+      box-shadow: inset -8px -12px 20px rgba(0,0,0,.15);
+    }
+    
+    @keyframes rise{
+      to{ transform:translateY(-120vh); opacity:0;}
+    }
+
+    /* Fireworks (glow dots) */
+    .firework{
+      position:fixed; 
+      width:6px; 
+      height:6px; 
+      border-radius:50%; 
+      background:transparent;
+      box-shadow:0 0 12px 6px currentColor;
+      animation:fw 1.2s ease-out forwards; 
+      z-index:3; 
+      pointer-events:none;
+    }
+    
+    @keyframes fw{
+      0%{ transform:scale(.2); opacity:1;}
+      100%{ transform:scale(3); opacity:0;}
+    }
+
+    /* Puzzle styles - FIXED */
+    .puzzle-banner {
+      background-color: #ff69b4;
+      color: white;
+      text-align: center;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    .puzzle-banner h2 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    #puzzle {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-template-rows: repeat(3, 100px);
+      gap: 0;
+      border: 5px solid #ff4081;
+      margin: 0 auto;
+      width: 306px;  /* 3 * 100px + 2 * 3px (gap) */
+      height: 306px; /* 3 * 100px + 2 * 3px (gap) */
+      overflow: hidden; /* Hide overflow to prevent visual glitches */
+    }
+    
+    .tile {
+      width: 100px;
+      height: 100px;
+      background-size: 300px 300px;  /* Total size of the image */
+      background-repeat: no-repeat;
+      cursor: pointer;
+      border: 1px solid #ff99cc;
+      box-sizing: border-box;
+      overflow: hidden; /* Hide overflow to prevent visual glitches */
+      position: relative; /* For positioning the number label */
+    }
+    
+    .tile::after {
+      content: attr(data-number);
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      padding: 3px 6px;
+      border-radius: 4px;
+      z-index: 10;
+    }
+    
+    .empty {
+      background: #ffe6f0;
+      cursor: default;
+      border: 1px dashed #ff99cc;
+    }
+    
+    .empty::after {
+      content: "";
+    }
+    
+    .popup-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    #game-message{
+      margin-top:15px;
+      font-size:20px;
+      color:#ff4081;
+      display:none;
+    }
+    
+    /* Puzzle buttons container */
+    .puzzle-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+      justify-content: center;
+    }
+
+    /* Confetti Catch Game Styles */
+    #catch-game {
+      position: relative;
+      width: 350px;
+      height: 400px;
+      border: 3px solid #ff1493;
+      margin: 0 auto;
+      overflow: hidden;
+      background: #fffafc;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      box-sizing: border-box;
+      padding-bottom: 10px;
+    }
+    
+    #sou {
+      position:absolute;
+      bottom:10px;
+      left:50%;
+      transform:translateX(-50%);
+      width:80px;
+      height:100px;
+    }
+    
+    .falling {
+      position:absolute;
+      top:-40px;
+      font-size:34px;
+      animation:fallItem linear;
+    }
+    
+    @keyframes fallItem {
+      to { top:480px; opacity:0.8; }
+    }
+    
+    #score-board {
+      position:absolute;
+      top:10px;
+      left:10px;
+      font-weight:bold;
+      font-size:20px;
+      color:var(--brand);
+    }
+    
+    #timer-display {
+      position:absolute;
+      top:10px;
+      right:10px;
+      font-weight:bold;
+      font-size:20px;
+      color:var(--brand);
+    }
+    
+    /* Mobile touch controls for Confetti Catch Game */
+    .mobile-controls {
+      position: absolute;
+      bottom: -60px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px;
+    }
+    
+    .mobile-control-btn {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ff66b2, #ff99cc);
+      color: white;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    
+    .mobile-control-btn:active {
+      transform: scale(0.95);
+    }
+    
+    footer{
+      text-align:center;
+      padding:20px;
+      background:#ff99cc;
+      color:#fff;
+      font-weight:700;
+      margin-top:40px;
+      box-shadow:0 -4px 12px rgba(0,0,0,.2);
+    }
+    
+    @media(max-width:980px){
+      .container{
+        flex-direction:column;
+        align-items:center;
+        gap:28px;
+      }
+      .grid{
+        margin-left:0;
+      }
+      .circle-container{
+        margin-right:0;
+      }
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    @media(max-width:600px){
+      .grid {
+        grid-template-columns: 1fr;
+      }
+      .heading {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .emoji-side {
+        justify-content: center;
+      }
+      .puzzle-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      /* Adjust game popup for mobile */
+      .popup-content {
+        width: 90%;
+        padding: 15px;
+      }
+      
+      /* Adjust catch game for mobile */
+      #catch-game {
+        width: 90vw;
+        max-width: 350px;
+      }
+      
+      /* Show mobile controls */
+      .mobile-controls {
+        display: flex;
+      }
+    }
+    
+    /* Hide mobile controls on desktop */
+    @media(min-width: 601px) {
+      .mobile-controls {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Theme Toggle Button -->
+  <div class="theme-toggle" onclick="toggleTheme()">
+    <i class="fas fa-moon" id="theme-icon"></i>
+  </div>
+
+  <!-- Floating Emojis -->
+  <div id="emoji-container"></div>
+
+  <!-- Header -->
+  <div class="heading">
+    <div class="emoji-side"><span>🎂</span><span>🎉</span><span>🎈</span><span>💖</span><span>🥳</span></div>
+    <div class="title-wrap">
+      <h1 id="birthday-title" aria-label="Happy Birthday Soumita"></h1>
+      <div id="birthdate">Born on 28th October ✨🎀</div>
+    </div>
+    <div class="emoji-side"><span>🥳</span><span>💖</span><span>🎈</span><span>🎉</span><span>🎂</span></div>
+  </div>
+
+  <div class="container">
+    <!-- Grid Photos -->
+    <div class="grid">
+      <img src="image1.jpeg" alt="photo1">
+      <img src="image3.jpeg" alt="photo2">
+      <img src="image4.jpeg" alt="photo3">
+      <img src="image5.jpeg" alt="photo4">
+      <img src="image6.jpeg" alt="photo5">
+      <img src="image7.jpeg" alt="photo6">
+    </div>
+
+    <!-- Circular photo + buttons -->
+    <div class="circle-container">
+      <div class="circle-photo"><img src="image2.jpeg" alt="Soumita"></div>
+      <h3>Soumita 💖</h3>
+      <button class="celebrate-btn" onclick="celebrate()">🎉 Celebrate</button>
+      <button class="message-btn" onclick="openMessage()">💌 Special Message</button>
+      <button class="music-btn" onclick="toggleMusic()">🎶 Toggle Music</button>
+      <button class="game-btn" onclick="openGame()">🎮 Games </button>
+    </div>
+  </div>
+
+  <!-- Popup Message -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <p id="typewriter"></p>
+      <button class="close-btn" onclick="closeMessage()">Close</button>
+    </div>
+  </div>
+
+  <!-- Game Popup -->
+  <div class="popup" id="game-popup">
+    <div class="popup-content">
+      <h2>🎮 Choose a Game 🎮</h2>
+      <button class="close-btn" onclick="startPuzzle()">🧩 Puzzle Game</button>
+      <button class="close-btn" onclick="startCatch()">🎁 Confetti Catch</button>
+      <button class="close-btn" onclick="closeGame()">Close</button>
+
+      <!-- Puzzle container -->
+      <div id="puzzle-section" style="display:none;">
+        <div class="puzzle-banner">
+          <h2>🧩 Birthday Puzzle 🧩</h2>
+        </div>
+        <div id="puzzle"></div>
+        <div id="game-message">🎉 Happy Birthday Bestie! 🎉</div>
+        <div class="puzzle-buttons">
+          <button class="close-btn" onclick="showHint()">Hint 💡</button>
+          <button class="close-btn" onclick="showSolution()">Solution 🧩</button>
+        </div>
+      </div>
+
+      <!-- Catch game container -->
+      <div id="catch-section" style="display:none;">
+        <h2>🎁 Confetti Catch 🎁</h2>
+        <div id="catch-game">
+          <div id="score-board">Score: 0</div>
+          <div id="timer-display">⏳ Time: 90</div>
+          <img id="sou" src="gif1.gif" alt="Mini Soumita">
+          <!-- Mobile touch controls -->
+          <div class="mobile-controls">
+            <button class="mobile-control-btn" id="left-btn">◀</button>
+            <button class="mobile-control-btn" id="right-btn">▶</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Made with 💖 by Soumik</footer>
+
+  <!-- Audio element for background music -->
+  <audio id="background-music" src="diewithasmileTrim.mp3" loop></audio>
+
+  <script>
+    /* ---------- Global Variables ---------- */
+    let chosenPhotoGlobal = null;
+    let sizeGlobal = 3;
+    let tilesGlobal = []; // Store tiles globally for hint and solution functions
+    let isShowingSolution = false; // Track if solution is currently shown
+    let lastHintedTile = null; // Track the last hinted tile to avoid repetition
+    let puzzleImagePieces = []; // Store the image pieces for each tile
+    
+    /* ---------- Music System ---------- */
+    let music = document.getElementById("background-music");
+    let isPlaying = false;
+
+    // autoplay on page load
+    window.addEventListener("load", () => {
+      music.play().then(() => {
+        isPlaying = true;
+      }).catch(err => {
+        console.log("🎵 Autoplay blocked by browser, will require manual start.");
+      });
+    });
+
+    function toggleMusic() {
+      if (isPlaying) {
+        music.pause();
+        isPlaying = false;
+      } else {
+        music.play();
+        isPlaying = true;
+      }
+    }
+
+    /* ---------- Title animation ---------- */
+    const titleText = "Happy Birthday Soumita";
+    function typeMainTitle(){
+      const el=document.getElementById("birthday-title");
+      const dateEl=document.getElementById("birthdate");
+      if(el.dataset.typed) return;
+      el.dataset.typed="1";
+      let i=0;
+      function step(){
+        if(i<titleText.length){
+          const ch=titleText[i]===" "?"\u00A0":titleText[i];
+          const s=document.createElement("span");s.textContent=ch;el.appendChild(s);
+          requestAnimationFrame(()=>{s.style.opacity=1;s.style.transform="translateY(0)";});
+          i++;setTimeout(step,110);
+        }else{
+          setTimeout(()=>{dateEl.style.opacity=1;dateEl.style.transform="translateY(0)";},600);
+        }
+      }
+      step();
+    }
+
+    /* ---------- Theme Toggle ---------- */
+    function toggleTheme() {
+      const body = document.body;
+      const themeIcon = document.getElementById("theme-icon");
+      
+      body.classList.toggle("dark-mode");
+      
+      if (body.classList.contains("dark-mode")) {
+        themeIcon.classList.remove("fa-moon");
+        themeIcon.classList.add("fa-sun");
+      } else {
+        themeIcon.classList.remove("fa-sun");
+        themeIcon.classList.add("fa-moon");
+      }
+    }
+
+    /* ---------- Celebration (confetti, balloons, fireworks) ---------- */
+    function celebrate(durationMs=10500){
+      const end=Date.now()+durationMs;
+
+      // Confetti
+      const confettiInterval=setInterval(()=>{
+        for(let i=0;i<20;i++){
+          const c=document.createElement("div");
+          c.className="confetti";
+          c.style.left=Math.random()*window.innerWidth+"px";
+          c.style.background=`hsl(${Math.random()*360},100%,50%)`;
+          c.style.animationDuration=(6+Math.random()*6)+"s";
+          c.style.transform=`rotate(${Math.random()*360}deg)`;
+          document.body.appendChild(c);
+          setTimeout(()=>c.remove(),13000);
+        }
+        if(Date.now()>end) clearInterval(confettiInterval);
+      },600);
+
+      // Balloons
+      const balloonBurst=setInterval(()=>{
+        for(let i=0;i<4;i++){
+          const b=document.createElement("div");
+          b.className="balloon";
+          b.style.left=Math.random()*window.innerWidth+"px";
+          b.style.background=`hsl(${Math.random()*360},70%,60%)`;
+          b.style.animationDuration="10s";
+          document.body.appendChild(b);
+          setTimeout(()=>b.remove(),11000);
+        }
+        if(Date.now()>end) clearInterval(balloonBurst);
+      },1500);
+
+      // Fireworks
+      const fwInterval=setInterval(()=>{
+        for(let i=0;i<6;i++){
+          const f=document.createElement("div");
+          f.className="firework";
+          f.style.left=Math.random()*window.innerWidth+"px";
+          f.style.top=(Math.random()*window.innerHeight*0.5+40)+"px";
+          f.style.color=`hsl(${Math.random()*360},100%,60%)`;
+          document.body.appendChild(f);
+          setTimeout(()=>f.remove(),1400);
+        }
+        if(Date.now()>end) clearInterval(fwInterval);
+      },300);
+    }
+
+    /* ---------- Floating emojis ---------- */
+    function createFloatingEmojis(){
+      const emojis=["🎂","🎉","🎈","💖","🥳"];
+      setInterval(()=>{
+        const e=document.createElement("div");
+        e.className="floating-emoji";
+        e.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left=Math.random()*window.innerWidth+"px";
+        e.style.animationDuration=(10+Math.random()*10)+"s";
+        document.getElementById("emoji-container").appendChild(e);
+        setTimeout(()=>e.remove(),20000);
+      },1500);
+    }
+
+    /* ---------- Message popup ---------- */
+    const message=`🎂💖 Happy Birthday, Soumita! 🎉🌸✨
+
+You're not just my best friend, you're the sparkle ✨ in my everyday life 🌞 and the reason behind so many of my best memories 💕.
+Tor sathe katano somosto sriti amar kache sera 🤧🌈.
+Tui sudhu amar bhalo bondhu nos 🥰, but tui emon jake chara ami nijer life o imagine korte parbo na 🤧❤️.
+
+May your year be filled with laughter 😂, adventures 🌍✈️, and dreams that come true 🌸🌟 — because you deserve nothing less than the absolute best 💖🎁.  — Soumik`;
+    
+    function openMessage(){
+      document.getElementById("popup").style.display="flex";
+      const box=document.getElementById("typewriter");
+      box.textContent="";
+      let i=0;(function tw(){if(i<message.length){box.textContent+=message.charAt(i++);setTimeout(tw,50);}})();
+    }
+    
+    function closeMessage(){
+      document.getElementById("popup").style.display="none";
+      document.getElementById("typewriter").textContent="";
+    }
+
+    /* ---------- Game Functions ---------- */
+    function openGame(){
+      document.getElementById("game-popup").style.display="flex";
+    }
+    
+    function closeGame(){
+      document.getElementById("game-popup").style.display="none";
+      document.getElementById("puzzle-section").style.display="none";
+      document.getElementById("catch-section").style.display="none";
+    }
+
+    /* ---------- Puzzle Game - FIXED ---------- */
+    function startPuzzle(){
+      document.getElementById("puzzle-section").style.display="block";
+      document.getElementById("catch-section").style.display="none";
+      document.getElementById("game-message").style.display="none"; // Hide win message
+      isShowingSolution = false; // Reset solution state
+      lastHintedTile = null; // Reset last hinted tile
+      initPuzzle();
+    }
+
+    function initPuzzle(){
+      const size = 3;
+      sizeGlobal = size;
+      const puzzle=document.getElementById("puzzle");
+      tilesGlobal = []; // Reset global tiles array
+      puzzleImagePieces = []; // Reset image pieces array
+      const photos=["image1.jpeg","image2.jpeg","image3.jpeg","image4.jpeg","image5.jpeg","image6.jpeg","image7.jpeg"];
+      chosenPhotoGlobal=photos[Math.floor(Math.random()*photos.length)];
+      
+      // Preload the image to ensure it loads properly
+      const img = new Image();
+      img.onload = function() {
+        // Clear any existing tiles
+        puzzle.innerHTML = "";
+        
+        // Create a canvas to process the image
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 300;
+        canvas.height = 300;
+        
+        // Draw the image on the canvas
+        ctx.drawImage(img, 0, 0, 300, 300);
+        
+        // Create image pieces for each tile
+        for(let row=0;row<size;row++){
+          for(let col=0;col<size;col++){
+            const index=row*size+col;
+            
+            // Create a canvas for this tile
+            const tileCanvas = document.createElement('canvas');
+            const tileCtx = tileCanvas.getContext('2d');
+            tileCanvas.width = 100;
+            tileCanvas.height = 100;
+            
+            // Draw the portion of the image for this tile
+            tileCtx.drawImage(
+              canvas,
+              col * 100, row * 100, // Source x, y
+              100, 100,             // Source width, height
+              0, 0,                 // Destination x, y
+              100, 100              // Destination width, height
+            );
+            
+            // Convert to data URL
+            const dataURL = tileCanvas.toDataURL();
+            puzzleImagePieces[index] = dataURL;
+          }
+        }
+        
+        // Create the tiles
+        for(let row=0;row<size;row++){
+          for(let col=0;col<size;col++){
+            const index=row*size+col;
+            const tile=document.createElement("div");
+            tile.classList.add("tile");
+            
+            // Use the pre-cropped image piece
+            tile.style.backgroundImage=`url(${puzzleImagePieces[index]})`;
+            tile.style.backgroundSize="100px 100px"; // Size of each tile
+            tile.style.backgroundPosition="0 0"; // No offset needed since we pre-cropped
+            tile.dataset.index=index;
+            tile.dataset.correctIndex=index; // Store the correct position
+            
+            // Add number label to the tile (1-8, empty tile has no number)
+            if (index < 8) {
+              tile.setAttribute("data-number", index + 1);
+            }
+            
+            tilesGlobal.push(tile);
+          }
+        }
+        
+        // Make the last tile empty
+        tilesGlobal[tilesGlobal.length-1].classList.add("empty");
+        tilesGlobal[tilesGlobal.length-1].style.backgroundImage="none";
+        
+        // Generate a solvable puzzle state
+        generateSolvablePuzzle();
+        
+        // Render the tiles
+        tilesGlobal.forEach(t=>puzzle.appendChild(t));
+        
+        // Set up click handler
+        puzzle.onclick=(e)=>{
+          // If solution is showing, ignore clicks
+          if(isShowingSolution) return;
+          
+          const tile=e.target;
+          if(!tile.classList.contains("tile")) return; // Make sure we're clicking a tile
+          if(tile.classList.contains("empty")) return;
+          
+          const emptyIndex=tilesGlobal.findIndex(t=>t.classList.contains("empty"));
+          const tileIndex=tilesGlobal.indexOf(tile);
+          const emptyRow=Math.floor(emptyIndex/size),emptyCol=emptyIndex%size;
+          const tileRow=Math.floor(tileIndex/size),tileCol=tileIndex%size;
+          
+          // Check if tile is adjacent to empty space
+          if((Math.abs(emptyRow-tileRow)===1 && emptyCol===tileCol) || 
+             (Math.abs(emptyCol-tileCol)===1 && emptyRow===tileRow)){
+            // Swap tiles
+            [tilesGlobal[emptyIndex],tilesGlobal[tileIndex]]=[tilesGlobal[tileIndex],tilesGlobal[emptyIndex]];
+            
+            // Re-render
+            tilesGlobal.forEach(t=>puzzle.appendChild(t));
+            
+            // Check for win
+            checkWin();
+          }
+        };
+      };
+      
+      // Start loading the image
+      img.src = chosenPhotoGlobal;
+    }
+
+    // Generate a solvable puzzle state
+    function generateSolvablePuzzle() {
+      const size = sizeGlobal;
+      const tiles = [...tilesGlobal];
+      
+      // Start with the solved state
+      const solvedState = tiles.map((tile, index) => index);
+      
+      // Generate random valid moves to shuffle the puzzle
+      const moves = 100; // Number of random moves to make
+      let emptyIndex = size * size - 1; // Start with the last tile as empty
+      
+      for (let i = 0; i < moves; i++) {
+        const emptyRow = Math.floor(emptyIndex / size);
+        const emptyCol = emptyIndex % size;
+        
+        // Find all possible moves
+        const possibleMoves = [];
+        
+        if (emptyRow > 0) possibleMoves.push(emptyIndex - size); // Up
+        if (emptyRow < size - 1) possibleMoves.push(emptyIndex + size); // Down
+        if (emptyCol > 0) possibleMoves.push(emptyIndex - 1); // Left
+        if (emptyCol < size - 1) possibleMoves.push(emptyIndex + 1); // Right
+        
+        // Choose a random move
+        const randomMove = possibleMoves[Math.floor(Math.random() * possibleMoves.length)];
+        
+        // Swap tiles
+        [tiles[emptyIndex], tiles[randomMove]] = [tiles[randomMove], tiles[emptyIndex]];
+        emptyIndex = randomMove;
+      }
+      
+      // Update the global tiles array
+      tilesGlobal = tiles;
+    }
+
+    function checkWin(){
+      const puzzle=document.getElementById("puzzle");
+      const tiles=Array.from(puzzle.children);
+      
+      // Check if all tiles are in the correct position
+      for(let i=0;i<tiles.length;i++){
+        if(parseInt(tiles[i].dataset.correctIndex)!==i) return;
+      }
+      
+      // Show win message
+      document.getElementById("game-message").textContent = "🎉 Puzzle Solved! Happy Birthday MiMi ❤️";
+      document.getElementById("game-message").style.display="block";
+      
+      // Trigger celebration
+      celebrate(8000);
+    }
+
+    // Enhanced Hint Function - shows the next correct move
+    function showHint(){
+      const puzzle=document.getElementById("puzzle");
+      const tiles=Array.from(puzzle.children);
+      const emptyIndex=tiles.findIndex(t=>t.classList.contains("empty"));
+      const size=sizeGlobal;
+      const emptyRow=Math.floor(emptyIndex/size), emptyCol=emptyIndex%size;
+
+      // Find adjacent movable tiles
+      const possibleMoves=[];
+      [[emptyRow-1,emptyCol],[emptyRow+1,emptyCol],[emptyRow,emptyCol-1],[emptyRow,emptyCol+1]].forEach(([r,c])=>{
+        if(r>=0 && r<size && c>=0 && c<size){
+          possibleMoves.push(r*size+c);
+        }
+      });
+
+      if(possibleMoves.length>0){
+        // Filter out the last hinted tile if possible
+        let availableMoves = possibleMoves.filter(index => {
+          return lastHintedTile === null || tiles[index] !== lastHintedTile;
+        });
+        
+        // If all possible moves were already hinted, reset and use all moves
+        if(availableMoves.length === 0) {
+          availableMoves = possibleMoves;
+          lastHintedTile = null;
+        }
+        
+        // Find which move gets us closer to the solution
+        let bestMove = null;
+        let bestScore = -1;
+        
+        availableMoves.forEach(moveIndex => {
+          const tile = tiles[moveIndex];
+          const correctIndex = parseInt(tile.dataset.correctIndex);
+          const currentIndex = tiles.indexOf(tile);
+          
+          // Calculate how much closer this move gets us to the solution
+          const currentDistance = Math.abs(currentIndex - correctIndex);
+          const newDistance = Math.abs(emptyIndex - correctIndex);
+          
+          // Calculate score based on improvement
+          const improvement = currentDistance - newDistance;
+          if(improvement > bestScore) {
+            bestScore = improvement;
+            bestMove = moveIndex;
+          }
+        });
+        
+        // If no move gets us closer, just pick the first available move
+        if(bestMove === null) {
+          bestMove = availableMoves[0];
+        }
+        
+        const hintTile=tiles[bestMove];
+        hintTile.classList.add("hint");
+        lastHintedTile = hintTile; // Remember this tile for next hint
+
+        // remove highlight after 2s
+        setTimeout(()=>{hintTile.classList.remove("hint");},2000);
+      }
+    }
+
+    // Solution Function - shows the correct position of all tiles
+    function showSolution(){
+      const puzzle=document.getElementById("puzzle");
+      
+      if(isShowingSolution) {
+        // If solution is already showing, hide it and restore current state
+        isShowingSolution = false;
+        initPuzzle();
+      } else {
+        // Show the solution
+        isShowingSolution = true;
+        
+        // Clear the puzzle
+        puzzle.innerHTML = "";
+        
+        // Create tiles in the correct order
+        const solutionTiles = [];
+        for(let i=0; i<9; i++) {
+          const tile = document.createElement("div");
+          tile.classList.add("tile", "solution-tile");
+          
+          // Use the pre-cropped image piece
+          tile.style.backgroundImage=`url(${puzzleImagePieces[i]})`;
+          tile.style.backgroundSize="100px 100px"; // Size of each tile
+          tile.style.backgroundPosition="0 0"; // No offset needed since we pre-cropped
+          
+          // Add position number for guidance
+          if (i < 8) {
+            tile.setAttribute("data-number", i + 1);
+          }
+          tile.setAttribute("data-pos", i+1);
+          
+          // Make the last tile empty
+          if(i === 8) {
+            tile.classList.add("empty");
+            tile.style.backgroundImage = "none";
+          }
+          
+          solutionTiles.push(tile);
+        }
+        
+        // Add the solution tiles to the puzzle
+        solutionTiles.forEach(tile => puzzle.appendChild(tile));
+        
+        // Show a message that this is the solution
+        const message = document.getElementById("game-message");
+        message.textContent = "🎉 Puzzle Solved! Happy Birthday MiMi ❤️";
+        message.style.display = "block";
+        
+        // Trigger celebration
+        celebrate(8000);
+      }
+    }
+
+    /* ---------- Confetti Catch Game ---------- */
+    let score = 0, catchInterval, moveLeft = false, moveRight = false, moveLoop, timer;
+    let touchStartX = null;
+
+    function startCatch() {
+      document.getElementById("puzzle-section").style.display = "none";
+      document.getElementById("catch-section").style.display = "block";
+      const game = document.getElementById("catch-game");
+      game.style.display = "block";
+      score = 0;
+      const sou = document.getElementById("sou");
+
+      // reset old timers if replayed
+      clearInterval(catchInterval);
+      clearInterval(moveLoop);
+      clearInterval(timer);
+
+      // Score board
+      document.getElementById("score-board").textContent = "Score: 0";
+
+      // Keyboard controls
+      document.onkeydown = (e) => {
+        if (e.key === "ArrowLeft") moveLeft = true;
+        if (e.key === "ArrowRight") moveRight = true;
+      };
+      document.onkeyup = (e) => {
+        if (e.key === "ArrowLeft") moveLeft = false;
+        if (e.key === "ArrowRight") moveRight = false;
+      };
+
+      // Touch controls for mobile
+      document.getElementById('left-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        moveLeft = true;
+      });
+      
+      document.getElementById('left-btn').addEventListener('touchend', (e) => {
+        e.preventDefault();
+        moveLeft = false;
+      });
+      
+      document.getElementById('right-btn').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        moveRight = true;
+      });
+      
+      document.getElementById('right-btn').addEventListener('touchend', (e) => {
+        e.preventDefault();
+        moveRight = false;
+      });
+
+      // Alternative touch controls - swipe on the game area
+      game.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+      });
+      
+      game.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+      });
+      
+      game.addEventListener('touchend', (e) => {
+        if (touchStartX === null) return;
+        
+        const touchEndX = e.changedTouches[0].clientX;
+        const diff = touchStartX - touchEndX;
+        
+        // Swipe threshold
+        if (Math.abs(diff) > 30) {
+          if (diff > 0) {
+            // Swipe left - move character left
+            moveLeft = true;
+            setTimeout(() => moveLeft = false, 100);
+          } else {
+            // Swipe right - move character right
+            moveRight = true;
+            setTimeout(() => moveRight = false, 100);
+          }
+        }
+        
+        touchStartX = null;
+      });
+
+      function moveSou() {
+        let left = parseInt(window.getComputedStyle(sou).left);
+        if (moveLeft && left > 0) sou.style.left = (left - 10) + "px";
+        if (moveRight && left < game.offsetWidth - 80) sou.style.left = (left + 10) + "px";
+      }
+
+      // Items falling
+      const items = ["🎂", "🍫", "🥟", "🍬", "🧸", "🎁", "🍩", "🍭", "👧"];
+      catchInterval = setInterval(() => {
+        const el = document.createElement("div");
+        el.className = "falling";
+        el.textContent = items[Math.floor(Math.random() * items.length)];
+        el.style.left = Math.random() * (game.offsetWidth - 40) + "px";
+        el.style.animationDuration = (3 + Math.random() * 2) + "s";
+        game.appendChild(el);
+
+        let fall = setInterval(() => {
+          let souRect = sou.getBoundingClientRect();
+          let elRect = el.getBoundingClientRect();
+          if (!(elRect.bottom < souRect.top ||
+                elRect.top > souRect.bottom ||
+                elRect.right < souRect.left ||
+                elRect.left > souRect.right)) {
+            score++;
+            document.getElementById("score-board").textContent = "Score: " + score;
+            el.remove();
+            clearInterval(fall);
+          }
+        }, 100);
+
+        setTimeout(() => { el.remove(); clearInterval(fall); }, 5000);
+      }, 1200);
+
+      // move Soumita
+      moveLoop = setInterval(moveSou, 50);
+
+      // Timer
+      let timeLeft = 90;
+      document.getElementById("timer-display").textContent = "⏳ Time: " + timeLeft;
+      
+      timer = setInterval(() => {
+        timeLeft--;
+        document.getElementById("timer-display").textContent = "⏳ Time: " + timeLeft;
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          clearInterval(catchInterval);
+          clearInterval(moveLoop);
+          alert("⏰ Time's up! Final Score: " + score);
+          document.getElementById("catch-section").style.display = "none";
+        }
+      }, 1000);
+    }
+
+    /* ---------- Init ---------- */
+    window.onload=()=>{
+      typeMainTitle(); 
+      createFloatingEmojis(); 
+      celebrate(10500);
+    }
+  </script>
+</body>
+</html>
